@@ -1,0 +1,143 @@
+<html>
+    <head>
+            <title> Car </title>
+        <style>
+            body{
+                margin:0;
+            };
+        </style>
+    </head>
+    <body>
+        <script src="build/three.js"></script>
+        <script src="examples/js/controls/OrbitControls.js"></script>
+
+        <script>
+            var scene= new THREE.Scene();
+            var camera=new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1 , 10000);
+            camera.position.set(1000,100,-300);
+            scene.add(camera);
+
+            var light = new THREE.DirectionalLight( 0xffffff );
+            light.position.set( 180, 100, -150 ).normalize();
+            scene.add(light);
+
+            var light2 = new THREE.DirectionalLight( 0xffffff );
+            light2.position.set( 180, 100, 150 ).normalize();
+            scene.add(light2);
+
+            var light3 = new THREE.DirectionalLight( 0xffffff );
+            light3.position.set(-180,0,0).normalize();
+            scene.add(light3);
+
+            var renderer=new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth,window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            //base of the scene 
+            var base_geometry = new THREE.PlaneGeometry(25000,25000);
+            var base_material = new THREE.MeshPhongMaterial( {color: 0xCCCC29, side: THREE.DoubleSide} );
+            var base = new THREE.Mesh(  base_geometry,base_material );
+            base.rotation.set(Math.PI/2,0,0); 
+            scene.add(base);
+            
+            //road
+            var road_geometry= new THREE.RingGeometry(530,430,100,100);
+            var road_material = new THREE.MeshBasicMaterial({color: 0x444444, side: THREE.DoubleSide} );
+            var road = new THREE.Mesh(road_geometry,road_material);
+            road.rotation.set(Math.PI/2,0,0);
+            road.position.y= 10 ;
+            scene.add(road);
+
+            //middle tree
+            var t_g= new THREE.CylinderGeometry(3,10,100,100);
+            var t_m = new THREE.MeshBasicMaterial({color: 0x222200, side: THREE.DoubleSide} );
+            var tree = new THREE.Mesh(t_g,t_m);
+            scene.add(tree);
+            //tree.position.set(15,60,20);
+            
+            var c_g = new THREE.ConeGeometry( 30, 80, 100 );
+            var c_m = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
+            var cone = new THREE.Mesh( c_g, c_m );
+            cone.position.y = 70;
+            //cone.position.set(0,70,0);
+            tree.add( cone );
+
+            //Body
+            var body_geometry = new THREE.BoxGeometry(120,4,50);
+            var body_meterial = new THREE.MeshPhongMaterial({color :0x9F749F});
+            var body = new THREE.Mesh(body_geometry,body_meterial);
+            body.position.y = 19.5 ;
+            body.position.z = 470 ;
+            tree.add(body);
+
+            //Body Engine area
+            var body2_geometry = new THREE.BoxGeometry(60,15,50);
+            var body2_meterial = new THREE.MeshPhongMaterial({color : 0x9F749F});
+            var body2 = new THREE.Mesh(body2_geometry,body2_meterial);
+            body2.position.x= -30 ;
+            body2.position.y= 8 ; 
+            body.add(body2);
+
+            //UPBody
+            var upbody_geometry = new THREE.BoxGeometry(30,20,50);
+            var upbody_meterial = new THREE.MeshPhongMaterial({color : 0x9F749F});
+            var upbody = new THREE.Mesh(upbody_geometry,upbody_meterial);
+            upbody.position.x= 15 ;
+            upbody.position.y= 14 ; 
+            body2.add(upbody);
+            
+            //adding an axel to connect two wheels
+            var axel_geometry = new THREE.CylinderGeometry(1.5,1.5,55,50,50);
+            var axel_material = new THREE.MeshBasicMaterial({color : 0x000055});
+            var axel = new THREE.Mesh(axel_geometry,axel_material);
+            axel.rotation.set(Math.PI/2,0,0); 
+            axel.position.x= -30 ; 
+            body.add(axel);
+
+            //FRONT WHEEL
+            var wheel_geometry = new THREE.TorusGeometry(7.5,2.5,100,100);
+            var wheel_meterial = new THREE.MeshBasicMaterial({color : 0x0E0E00});
+            var wheel = new THREE.Mesh(wheel_geometry,wheel_meterial);
+            wheel.rotation.set(Math.PI/2,0,0); 
+            wheel.position.y= 28 ;
+            axel.add(wheel);
+
+            //Spokes
+            var spoke_geometry = new THREE.CylinderGeometry(6,6,2,32,1);
+            var spoke_material = new THREE.MeshBasicMaterial({color : 0x84847D});
+            var spoke = new THREE.Mesh(spoke_geometry,spoke_material);
+            spoke.rotation.set(Math.PI/2,0,0); 
+            wheel.add(spoke);
+
+            //Clone the Wheel and the Spoke 
+            var front_wheel = wheel.clone();
+            front_wheel.position.y = -28 ;
+            axel.add(front_wheel);
+
+            //BACK WHEELS
+            var back_wheels = axel.clone();
+            back_wheels.position.x = 25 ;
+            body.add(back_wheels);
+
+            window.addEventListener('resize',function(){
+                var width = window.innerWidth;
+                var height= window.innerHeight;
+                renderer.setSize(width, height);
+                camera.aspect=width/height;
+                camera.updateProjectionMatrix();
+            })
+
+            function render() {
+                axel.rotation.y +=0.01 ;
+                back_wheels.rotation.y +=0.005 ;
+                tree.rotation.y -=0.001;
+                requestAnimationFrame(render);
+                renderer.render(scene,camera);
+            };
+            render();
+
+            controls=new THREE.OrbitControls(camera,renderer.domElement);
+
+        </script>
+    </body>
+</html>
